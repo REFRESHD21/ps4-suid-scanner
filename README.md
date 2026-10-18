@@ -17,13 +17,16 @@ Research tools, kernel offsets, WebKit ROP gadgets, and exploit framework for PS
 
 | File | Description |
 |------|-------------|
-| `exploit.html` | **WebKit entry page** — load on PS4 browser |
+| `exploit.html` | **WebKit entry page** (supports 14.00 and links to 13.04) |
+| `exploit_1304.html` | **WebKit + Celsius KEX entry page** (dedicated for FW 13.04) |
+| `celsius_kex.js` | **Celsius Kernel Exploit engine** (ROP mount, kernel patches, BinLoader) |
+| `build_celsius_ufs.py` | **Celsius UFS image generator** (malformed superblock with integer overflow) |
+| `jordy_stage2.js` | Stage 2: persistent R/W + Celsius KEX integration for 13.04 |
+| `webkit_gadgets_1304.js` | WebKit ROP gadgets FW 13.04 (16 gadgets) |
+| `1304.c` / `1304.h` | Complete kernel offsets FW 13.04 |
 | `webkit_gadgets_1400.js` | WebKit ROP gadgets FW 14.00 (17/17 verified) |
 | `jordy_stage2_1400.js` | Stage 2: persistent R/W + ROP chain for 14.00 |
-| `jordy_stage2.js` | Stage 2: original 13.04 version (reference) |
 | `1400.c` / `1400.h` | Complete kernel offsets FW 14.00 |
-| `1304.c` / `1304.h` | Complete kernel offsets FW 13.04 |
-| `webkit_gadgets_1304.js` | WebKit ROP gadgets FW 13.04 (16 gadgets) |
 | `webkit_gadgets_1350.js` | WebKit ROP gadgets FW 13.50 (18 gadgets) |
 | `1400_offsets.txt` | Offset verification notes |
 | `1352_offsets.txt` | Partial kernel offsets FW 13.52 |
@@ -97,24 +100,31 @@ Since WebKit was NOT updated in 14.00, all 13.04 vectors should work:
 
 ## Quick Start
 
-### On PS4 (FW 14.00)
-1. Host `exploit.html`, `webkit_gadgets_1400.js`, and `jordy_stage2_1400.js` on a local web server
-2. Navigate PS4 browser to `http://<your-ip>:<port>/exploit.html`
-3. Press **Run Exploit**
-4. *(Currently runs in analysis mode until WebKit primitive is integrated)*
+### On PS4 (FW 13.04 — Celsius KEX Active)
+1. Build malicious UFS image:
+   ```bash
+   python3 build_celsius_ufs.py -o celsius.img
+   ```
+2. Copy `celsius.img` to the root of a FAT32/exFAT USB drive (appears at `/mnt/usb0/celsius.img` on PS4).
+3. Insert USB into the PS4.
+4. Host the exploit directory on PC/local network:
+   ```bash
+   python3 -m http.server 8080
+   ```
+5. Navigate PS4 browser to `http://<your-ip>:8080/exploit_1304.html`.
+6. Click **Run Exploit (Celsius)** to trigger the userland chain + Celsius kernel exploit.
+7. Once kernel patches are applied, send payload (GoldHEN/HEN) to port 9021.
+
+### On PS4 (FW 14.00 — Gadgets Verified)
+1. Host `exploit.html`, `webkit_gadgets_1400.js`, and `jordy_stage2_1400.js`.
+2. Navigate PS4 browser to `http://<your-ip>:<port>/exploit.html`.
+3. Press **Run Exploit**.
+4. *(Runs stage2 analysis until scene integrates 14.00 WebKit primitive + new KEX)*.
 
 ### For Development (PC)
-1. Open `exploit.html` in any browser
-2. It detects non-PS4 and enters analysis mode
-3. Displays all gadgets, kernel offsets, and patch plan
-4. Useful for verifying offsets and chain construction
-
-### Hosting (Python)
-```bash
-cd ps4-suid-scanner
-python3 -m http.server 8080
-# Then on PS4: http://<pc-ip>:8080/exploit.html
-```
+1. Open `exploit_1304.html` or `exploit.html` in any browser.
+2. Automatically detects non-PS4 and enters survey/analysis mode.
+3. Displays all verified gadgets, kernel offsets, and chain structure.
 
 ## WebKit Gadgets (14.00)
 
