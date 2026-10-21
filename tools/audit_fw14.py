@@ -136,7 +136,7 @@ else:
 
 # Detect contradictions between a blanket verification claim and partial gadget evidence.
 stage2 = read("jordy_stage2_1400.js")
-if re.search(r"17\s*/\s*17\s+(?:ROP\s+)?gadgets?\s+verified", stage2, re.I) and re.search(
+if re.search(r"(?:17\s*/\s*17\s+(?:ROP\s+)?gadgets?\s+verified|gadgets?:\s*17\s*/\s*17\s+verified)", stage2, re.I) and re.search(
     r"partial|not followed by clean ret|verify before use", gadgets, re.I
 ):
     add("FAIL", "contradictory gadget confidence claim",
