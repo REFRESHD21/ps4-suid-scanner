@@ -39,7 +39,12 @@ for rel in ("1400.c", "1400.h", "1400_offsets.txt",
 # Resolve quoted includes from the source directory and repository root. This is
 # a dependency inventory, not a substitute for compiling with the target SDK.
 include_re = re.compile(r'^\s*#\s*include\s+"([^"]+)"', re.M)
-source_files = sorted([*ROOT.glob("*.c"), *ROOT.glob("*.h")])
+source_files = sorted(
+    path for pattern in ("*.c", "*.h")
+    for path in ROOT.rglob(pattern)
+    if not any(part.startswith(".") or part in {"node_modules", "build", "dist"}
+               for part in path.relative_to(ROOT).parts[:-1])
+)
 missing_includes: list[str] = []
 for source in source_files:
     source_text = source.read_text(encoding="utf-8", errors="replace")
@@ -50,9 +55,9 @@ for source in source_files:
             for candidate in candidates
         )
         if exists_in_repo:
-            add("PASS", f"quoted include {source.name} -> {include}", "resolved within repository")
+            add("PASS", f"quoted include {source.relative_to(ROOT)} -> {include}", "resolved within repository")
         else:
-            finding = f"{source.name} -> {include}"
+            finding = f"{source.relative_to(ROOT)} -> {include}"
             missing_includes.append(finding)
             add("BLOCKED", f"quoted include {finding}",
                 "not resolved within this repository; may be supplied by an external SDK or missing source tree")
