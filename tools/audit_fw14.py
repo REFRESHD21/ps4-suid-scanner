@@ -134,6 +134,17 @@ else:
     add("UNVERIFIED", "WebKit gadget evidence",
         "source comments alone cannot independently verify offsets; provide the exact binary and hash")
 
+# Detect contradictions between a blanket verification claim and partial gadget evidence.
+stage2 = read("jordy_stage2_1400.js")
+if re.search(r"17\s*/\s*17\s+(?:ROP\s+)?gadgets?\s+verified", stage2, re.I) and re.search(
+    r"partial|not followed by clean ret|verify before use", gadgets, re.I
+):
+    add("FAIL", "contradictory gadget confidence claim",
+        "stage two claims 17/17 gadgets verified while the gadget source labels one or more entries partial/unverified")
+else:
+    add("UNVERIFIED", "gadget claim consistency",
+        "no contradiction detected by this narrow check; this does not independently verify gadget bytes")
+
 # The HTML / stage-two sources explicitly indicate that the chain is incomplete.
 combined = read("exploit.html") + "\n" + read("jordy_stage2_1400.js")
 if re.search(r"not yet integrated|returns 0|TODO: verify|needs to be found|placeholder", combined, re.I):
