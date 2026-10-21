@@ -64,3 +64,12 @@ These are dependency/layout findings only. The upstream headers were traced but 
 - Correctness of all listed kernel offsets against a genuine matching firmware image.
 - A compatible kernel exploit for firmware 14.00.
 - An end-to-end jailbreak tested on actual firmware 14.00 hardware.
+
+
+## Kernel vulnerability lead correction
+
+The CVE analysis now distinguishes the real upstream FreeBSD advisory for CVE-2026-49415 from unproven applicability to PS4. FreeBSD's advisory describes a SUID `execve(2)` TOCTOU race and lists fixes for supported FreeBSD 14.x/15.x releases; it does not establish that the same vulnerable code path exists in Orbis OS's older, customized kernel. Finding generic SUID helper functions in an old source tree is not enough. The lead remains **NOT ESTABLISHED FOR PS4** until the target code path, process-memory access checks, and sandbox reachability are compared and reproduced.
+
+Reference: [FreeBSD-SA-26:39.execve](https://lists.freebsd.org/archives/freebsd-security/2026-June/000522.html).
+
+This qualification changes no overall conclusion: no compatible FW 14.00 kernel exploit or end-to-end jailbreak has been demonstrated by this repository.
