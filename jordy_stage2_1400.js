@@ -2,7 +2,7 @@
 // Jordy Stage 2 — PS4 Firmware 14.00
 // Persistent R/W + ROP Chain + Kernel Exploit
 //
-// WebKit gadgets: webkit_gadgets_1400.js (17/17 verified)
+// WebKit gadget candidates: webkit_gadgets_1400.js (not independently verified)
 // Kernel offsets: 1400.c (Al-Azif, Scene-Collective)
 //
 // INSTRUCTIONS:
@@ -25,7 +25,7 @@ var g_libkernel_base = 0;
 // ============================================================
 // WebKit 14.00 ROP Gadgets (from webkit_gadgets_1400.js)
 // Source: libSceNKWebKit.sprx.decrypted
-// All 17 gadgets verified via byte pattern search
+// Gadget candidates require matching-binary hashes and reproducible verification; some entries are partial.
 // ============================================================
 var G = {
     RET:             0x004032,
@@ -378,7 +378,7 @@ function kernelPostExploit(kbase) {
 // ============================================================
 function stage2_run() {
     log("====== STAGE 2 — FW 14.00 ======");
-    log("WebKit gadgets: 17/17 verified");
+    log("WebKit gadget candidates loaded; verification evidence is incomplete");
     log("Kernel offsets: Al-Azif (Scene-Collective)");
     log("");
 
