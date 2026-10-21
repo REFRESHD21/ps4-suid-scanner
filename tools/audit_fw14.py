@@ -7,9 +7,11 @@ functionality.
 """
 from __future__ import annotations
 
+import argparse
 import re
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -188,3 +190,14 @@ report += [
 (ROOT / "audit-report.md").write_text("\n".join(report), encoding="utf-8")
 print(f"\nSummary: PASS={passed} FAIL={failed} UNVERIFIED={unverified} BLOCKED={blocked}")
 print(f"Report written to {ROOT / 'audit-report.md'}")
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument(
+    "--strict",
+    action="store_true",
+    help="exit non-zero when the report contains one or more FAIL findings",
+)
+args = parser.parse_args()
+if args.strict and failed:
+    print(f"Strict mode: failing because {failed} FAIL finding(s) were reported.", file=sys.stderr)
+    raise SystemExit(1)
