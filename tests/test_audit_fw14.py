@@ -107,7 +107,7 @@ class AuditSmokeTests(unittest.TestCase):
         )
         report = self.run_audit(root)
         self.assertIn("FAIL — contradictory gadget confidence claim", report)
-        self.assertIn("README or stage two claims 17/17 gadgets verified", report)
+        self.assertIn("repository claims 17/17 gadgets verified", report)
 
 
     def test_strict_mode_fails_on_audit_contradictions(self) -> None:
@@ -137,7 +137,7 @@ class AuditSmokeTests(unittest.TestCase):
         )
         report = self.run_audit(root)
         self.assertIn("FAIL — contradictory gadget confidence claim", report)
-        self.assertIn("README or stage two claims 17/17 gadgets verified", report)
+        self.assertIn("repository claims 17/17 gadgets verified", report)
 
 
 
