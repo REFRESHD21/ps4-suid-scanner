@@ -90,6 +90,22 @@ if c_match and txt_match:
 else:
     add("UNVERIFIED", "SYSENT consistency", "could not parse SYSENT from both sources")
 
+# The stage-two JavaScript has a separate copy of the same critical offset.
+# Check it independently so a stale runtime value cannot silently disagree.
+stage2 = read("jordy_stage2_1400.js")
+stage2_match = re.search(r"\\bSYSENT\\s*:\\s*(0x[0-9A-Fa-f]+)", stage2)
+if c_match and stage2_match:
+    c_value = c_match.group(1).lower()
+    stage2_value = stage2_match.group(1).lower()
+    if c_value == stage2_value:
+        add("PASS", "stage-two SYSENT consistency", f"1400.c and stage two both say {c_value}")
+    else:
+        add("FAIL", "stage-two SYSENT consistency",
+            f"1400.c says {c_value}; jordy_stage2_1400.js says {stage2_value}. Do not execute with conflicting offsets.")
+else:
+    add("UNVERIFIED", "stage-two SYSENT consistency",
+        "could not parse SYSENT from both 1400.c and jordy_stage2_1400.js")
+
 # Placeholder / TODO scan: report counts and a small sample, not every match.
 scan_files = ["exploit.html", "jordy_stage2_1400.js", "webkit_gadgets_1400.js", "1400.c"]
 patterns = re.compile(r"TODO|PLACEHOLDER|PENDING_DUMP|DEADC0DE|not yet integrated|needs to be found", re.I)
