@@ -1,13 +1,16 @@
 // PS4 Kernel Offsets - Firmware 14.00 (PROVISIONAL / UNVERIFIED)
 // Status: PENDING VERIFICATION against clean 14.00 flash dump
 // Notice: Previous offsets were synthetically generated and require byte-pattern validation.
+// Upstream source reference: https://github.com/Scene-Collective/ps4-hen/tree/d077fb4031cf0e089fb7a233cebeebcd1ed3c68e
 // Sony released FW 14.00 on September 16, 2026
 
 // Data addresses (CRITICAL: Needs dump confirmation):
 // XFAST_SYSCALL = 0x000001C0
 // PRISON0       = 0x0111FA18 (Tentative, matches 13.00-13.52)
 // ROOTVNODE     = 0x02136E90 (Tentative, matches 13.00-13.52)
-// SYSENT        = 0x0110A760 (Carried from 13.52; DO NOT revert to 13.04 0x01102B70)
+// SYSENT        = 0x0110A760 (CONTRADICTED historical claim; upstream
+// d077fb4031cf0e089fb7a233cebeebcd1ed3c68e and 1400.c use 0x01102B70.
+// Do not use this value without firmware-matched binary evidence.)
 // M_TEMP        = 0x01520D00
 // ALLPROC       = 0x01B28538
 // FPU_CTX       = 0x026542C0

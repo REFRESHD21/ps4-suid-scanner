@@ -6,7 +6,8 @@
 
 // PS4 Kernel Offsets - Firmware 14.00
 // Source: Al-Azif (Scene-Collective/ps4-hen pre-release-main-182)
-// Commit: d077fb4, September 19, 2026
+// Commit: d077fb4031cf0e089fb7a233cebeebcd1ed3c68e, September 19, 2026
+// URL: https://github.com/Scene-Collective/ps4-hen/tree/d077fb4031cf0e089fb7a233cebeebcd1ed3c68e
 // Sony released FW 14.00 on September 16, 2026 ("stability improvements")
 
 const struct kpayload_offsets offsets_1400 PAYLOAD_RDATA = {

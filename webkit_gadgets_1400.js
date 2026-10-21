@@ -1,8 +1,9 @@
 // ============================================================
 // WebKit ROP Gadgets — PS4 Firmware 14.00
 // Source: libSceNKWebKit.sprx.decrypted
+// Source URL: https://github.com/adri22235/ps4-suid-scanner
 // Found using Python byte pattern search
-// Status: 17/17 gadgets verified
+// Status: source-listed candidates; binary verification unavailable
 // ============================================================
 //
 // Usage: Include this file before jordy_stage2_1400.js
@@ -21,11 +22,12 @@
 //     They may clobber additional registers. Verify before using in chain.
 //   - POP_R13 is actually: pop r13; pop r14; pop r15; ret
 //     Requires 3 stack slots (r13 value + r14 pad + r15 pad)
-//   - All offsets confirmed identical to 13.04 (WebKit not updated in 14.00)
+//   - Values are listed as identical to 13.04 in repository sources; this is
+//     not an independent 14.00 binary comparison.
 // ============================================================
 
 const webkit_gadgets_1400 = {
-    // ── Core gadgets (verified clean) ──
+    // ── Core gadget candidates (opcode bytes claimed in source) ──
     wk_RET          : 0x4032,       // c3
     wk_LEAVE_RET    : 0x1c2f7,      // c9 c3
     wk_POP_RAX_RET  : 0x14504,      // 58 c3
@@ -37,7 +39,7 @@ const webkit_gadgets_1400 = {
     wk_POP_RBP_RET  : 0x40b6,       // 5d c3
     wk_POP_RSP_RET  : 0x73017,      // 5c c3 (stack pivot!)
 
-    // ── Extended registers (verified) ──
+    // ── Extended register candidates ──
     wk_POP_R8_RET   : 0x230cbe1,    // 41 58 c3
     wk_POP_R9_RET   : 0x9df883,     // 41 59 c3 (pop r9; ret)
     wk_POP_R12_RET  : 0x242ab15,    // 41 5c c3
@@ -53,15 +55,12 @@ const webkit_gadgets_1400 = {
 };
 
 // ============================================================
-// IMPORTANT OBSERVATION:
-// All 17 gadget offsets are IDENTICAL between FW 13.04 and 14.00
-// This strongly suggests Sony did NOT update WebKit in FW 14.00.
-// The "stability improvements" in 14.00 were kernel-only patches.
+// IMPORTANT LIMITATION:
+// The repository lists matching 13.04 and 14.00 values, but the referenced
+// 14.00 binary and extraction script are absent. Do not infer WebKit identity.
 //
-// This means:
-//   1. WebKit entry vectors from 13.04 should work on 14.00
-//   2. Same vtable offsets, GOT layout, JIT behavior
-//   3. Only kernel offsets changed (see 1400.c)
+// Consequently, WebKit entry vectors, vtable/GOT layout, and JIT behavior
+// remain research questions until matched binaries and hardware tests exist.
 //
 // Missing gadget for 14.00 (search in dump):
 //   JMP_RSI (ff e6) — was 0x0cda83 in 13.04
