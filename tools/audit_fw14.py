@@ -139,12 +139,12 @@ else:
 # Detect contradictions between blanket verification claims in README/stage two
 # and partial gadget evidence. README claims are user-facing and must be audited too.
 stage2 = read("jordy_stage2_1400.js")
-claim_sources = read("README.md") + "\n" + stage2
+claim_sources = "\n".join(read(rel) for rel in ("README.md", "jordy_stage2_1400.js", "exploit.html", "webkit_gadgets_1400.js"))
 if re.search(r"(?:17\s*/\s*17\s+(?:ROP\s+)?gadgets?\s+verified|gadgets?:\s*17\s*/\s*17\s+verified)", claim_sources, re.I) and re.search(
     r"partial|not followed by clean ret|verify before use", gadgets, re.I
 ):
     add("FAIL", "contradictory gadget confidence claim",
-        "README or stage two claims 17/17 gadgets verified while the gadget source labels one or more entries partial/unverified")
+        "repository claims 17/17 gadgets verified while source evidence marks entries partial/unverified")
 else:
     add("UNVERIFIED", "gadget claim consistency",
         "no contradiction detected by this narrow check; this does not independently verify gadget bytes")
