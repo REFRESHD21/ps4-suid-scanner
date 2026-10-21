@@ -152,7 +152,7 @@ else:
 # The HTML / stage-two sources explicitly indicate that the chain is incomplete.
 combined = read("exploit.html") + "\n" + read("jordy_stage2_1400.js")
 if re.search(r"not yet integrated|returns 0|TODO: verify|needs to be found|placeholder", combined, re.I):
-    add("FAIL", "end-to-end FW 14.00 chain", "source contains explicit missing primitives / placeholder values")
+    add("BLOCKED", "end-to-end FW 14.00 chain", "source contains explicit missing primitives / placeholder values; this is a known incomplete milestone, not evidence of a working chain")
 else:
     add("UNVERIFIED", "end-to-end FW 14.00 chain",
         "static source audit cannot prove an end-to-end chain; console testing and independent evidence are required")
