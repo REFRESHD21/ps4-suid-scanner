@@ -85,6 +85,16 @@ class AuditSmokeTests(unittest.TestCase):
         report = self.run_audit(root)
         self.assertIn("BLOCKED — quoted include src/include/nested.h -> missing_nested.h", report)
 
+    def test_partial_gadget_claim_remains_unverified(self) -> None:
+        root = self.make_tree(c_sysent="0x01102B70", note_sysent="0x01102B70")
+        (root / "webkit_gadgets_1400.js").write_text(
+            "// partial match; verify before use\nconst candidate = 1;\n",
+            encoding="utf-8",
+        )
+        report = self.run_audit(root)
+        self.assertIn("UNVERIFIED — WebKit gadget evidence", report)
+        self.assertIn("binary hash and reproducible extraction evidence are still needed", report)
+
 
 if __name__ == "__main__":
     unittest.main()
