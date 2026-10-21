@@ -57,7 +57,7 @@ class AuditSmokeTests(unittest.TestCase):
         report = self.run_audit(root)
         self.assertIn("PASS — placeholder scan", report)
         self.assertIn("PASS — SYSENT consistency", report)
-        self.assertIn("UNVERIFIED — end-to-end FW 14.00 chain", report)
+        self.assertIn("BLOCKED — end-to-end FW 14.00 chain", report)
 
     def test_stage2_sysent_mismatch_is_reported(self) -> None:
         root = self.make_tree(
