@@ -110,6 +110,21 @@ class AuditSmokeTests(unittest.TestCase):
         self.assertIn("README or stage two claims 17/17 gadgets verified", report)
 
 
+    def test_strict_mode_fails_on_audit_contradictions(self) -> None:
+        root = self.make_tree(
+            c_sysent="0x01102B70",
+            note_sysent="0x0110A760",
+        )
+        proc = subprocess.run(
+            [sys.executable, str(root / "tools" / "audit_fw14.py"), "--strict"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertNotEqual(proc.returncode, 0, msg=proc.stdout + proc.stderr)
+        self.assertIn("Strict mode: failing because", proc.stderr)
+
     def test_readme_blanket_verified_claim_conflicts_with_partial_gadget(self) -> None:
         root = self.make_tree(c_sysent="0x01102B70", note_sysent="0x01102B70")
         (root / "README.md").write_text(
