@@ -12,7 +12,7 @@ This review is evidence triage, not an exploit implementation. It deliberately d
 
 - [PS4 13.xx / 14.00 research README](https://github.com/adri22235/ps4-13xx-research/blob/main/README.md)
 - [PS4 FW 14.00 vulnerability candidate notes](https://github.com/adri22235/ps4-13xx-research/blob/main/vuln_research_1400.md)
-- [FreeBSD-SA-26:54.sysvsem / CVE-2026-58087](https://lists.freebsd.org/archives/freebsd-security/2026-July/000541.html)
+- [FreeBSD-SA-26:54.sysvsem / CVE-2026-58087](https://cgit.freebsd.org/src/commit/sys/kern?id=8c5e2d26cde5d06c362e6925dbcdbd43aa315a12)
 - [FreeBSD-SA-26:64.sysvsem / CVE-2026-58098](https://lists.freebsd.org/archives/freebsd-security/2026-September/000569.html)
 - [FreeBSD-SA-26:62.tty / CVE-2026-58093](https://security.freebsd.org/advisories/FreeBSD-SA-26:62.tty.asc)
 - [FreeBSD-SA-26:63.posixshm / CVE-2026-58094](https://security.freebsd.org/advisories/FreeBSD-SA-26:63.posixshm.asc)
