@@ -2,7 +2,7 @@
 // WebKit ROP Gadgets — PS4 Firmware 14.00
 // Source: libSceNKWebKit.sprx.decrypted
 // Found using Python byte pattern search
-// Status: 17/17 gadgets verified
+// Status: unverified candidate offsets; partial entries are explicitly marked below
 // ============================================================
 //
 // Usage: Include this file before jordy_stage2_1400.js
@@ -54,14 +54,14 @@ const webkit_gadgets_1400 = {
 
 // ============================================================
 // IMPORTANT OBSERVATION:
-// All 17 gadget offsets are IDENTICAL between FW 13.04 and 14.00
-// This strongly suggests Sony did NOT update WebKit in FW 14.00.
+// The listed offsets are claimed to match FW 13.04; this has NOT been independently verified against a matching FW 14.00 binary.
+// Do not infer that WebKit was unchanged without matching-binary hashes and reproducible comparison.
 // The "stability improvements" in 14.00 were kernel-only patches.
 //
 // This means:
-//   1. WebKit entry vectors from 13.04 should work on 14.00
-//   2. Same vtable offsets, GOT layout, JIT behavior
-//   3. Only kernel offsets changed (see 1400.c)
+//   1. WebKit entry vectors from 13.04 require separate 14.00 verification
+//   2. vtable offsets, GOT layout, and JIT behavior remain unverified
+//   3. Do not assume only kernel offsets changed
 //
 // Missing gadget for 14.00 (search in dump):
 //   JMP_RSI (ff e6) — was 0x0cda83 in 13.04
