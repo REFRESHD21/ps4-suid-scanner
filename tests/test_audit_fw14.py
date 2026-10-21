@@ -77,6 +77,14 @@ class AuditSmokeTests(unittest.TestCase):
         report = self.run_audit(root)
         self.assertIn("BLOCKED — quoted include 1400.c -> missing_dependency.h", report)
 
+    def test_nested_c_header_includes_are_scanned(self) -> None:
+        root = self.make_tree(c_sysent="0x01102B70", note_sysent="0x01102B70")
+        nested = root / "src" / "include"
+        nested.mkdir(parents=True)
+        (nested / "nested.h").write_text('#include "missing_nested.h"\\n', encoding="utf-8")
+        report = self.run_audit(root)
+        self.assertIn("BLOCKED — quoted include src/include/nested.h -> missing_nested.h", report)
+
 
 if __name__ == "__main__":
     unittest.main()
