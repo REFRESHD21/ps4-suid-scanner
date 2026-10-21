@@ -36,12 +36,28 @@ for rel in ("1400.c", "1400.h", "1400_offsets.txt",
     else:
         add("FAIL", f"required file {rel}", "missing")
 
-for rel in ("sections.h", "offsets.h", "offsets/1400.h"):
-    if (ROOT / rel).is_file():
-        add("PASS", f"include dependency {rel}", "present at expected repository-relative path")
-    else:
-        add("BLOCKED", f"include dependency {rel}",
-            "not present at expected path; C compilation cannot be confirmed from this tree alone")
+# Resolve quoted includes from the source directory and repository root. This is
+# a dependency inventory, not a substitute for compiling with the target SDK.
+include_re = re.compile(r'^\s*#\s*include\s+"([^"]+)"', re.M)
+source_files = sorted([*ROOT.glob("*.c"), *ROOT.glob("*.h")])
+missing_includes: list[str] = []
+for source in source_files:
+    source_text = source.read_text(encoding="utf-8", errors="replace")
+    for include in include_re.findall(source_text):
+        candidates = [(source.parent / include).resolve(), (ROOT / include).resolve()]
+        exists_in_repo = any(
+            candidate.is_relative_to(ROOT.resolve()) and candidate.is_file()
+            for candidate in candidates
+        )
+        if exists_in_repo:
+            add("PASS", f"quoted include {source.name} -> {include}", "resolved within repository")
+        else:
+            finding = f"{source.name} -> {include}"
+            missing_includes.append(finding)
+            add("BLOCKED", f"quoted include {finding}",
+                "not resolved within this repository; may be supplied by an external SDK or missing source tree")
+if not source_files:
+    add("BLOCKED", "C include inventory", "no top-level C/header files found")
 
 # Syntax checks are meaningful, but are not exploit/runtime validation.
 node = shutil.which("node")
