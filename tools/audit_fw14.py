@@ -93,7 +93,7 @@ else:
 # The stage-two JavaScript has a separate copy of the same critical offset.
 # Check it independently so a stale runtime value cannot silently disagree.
 stage2 = read("jordy_stage2_1400.js")
-stage2_match = re.search(r"\\bSYSENT\\s*:\\s*(0x[0-9A-Fa-f]+)", stage2)
+stage2_match = re.search(r"\bSYSENT\s*:\s*(0x[0-9A-Fa-f]+)", stage2)
 if c_match and stage2_match:
     c_value = c_match.group(1).lower()
     stage2_value = stage2_match.group(1).lower()
