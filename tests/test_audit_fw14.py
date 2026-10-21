@@ -110,6 +110,22 @@ class AuditSmokeTests(unittest.TestCase):
         self.assertIn("repository claims 17/17 gadgets verified", report)
 
 
+    def test_strict_mode_succeeds_when_no_fail_findings_exist(self) -> None:
+        root = self.make_tree(
+            c_sysent="0x01102B70",
+            note_sysent="0x01102B70",
+            stage2="var K = { SYSENT: 0x01102B70 }; function example() { return 0; }",
+        )
+        proc = subprocess.run(
+            [sys.executable, str(root / "tools" / "audit_fw14.py"), "--strict"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stdout + proc.stderr)
+        self.assertIn("Summary:", proc.stdout)
+
     def test_strict_mode_fails_on_audit_contradictions(self) -> None:
         root = self.make_tree(
             c_sysent="0x01102B70",
