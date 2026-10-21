@@ -59,6 +59,13 @@ class AuditSmokeTests(unittest.TestCase):
         self.assertIn("PASS — SYSENT consistency", report)
         self.assertIn("UNVERIFIED — end-to-end FW 14.00 chain", report)
 
+    def test_missing_quoted_c_include_is_reported_as_blocked(self) -> None:
+        root = self.make_tree(c_sysent="0x01102B70", note_sysent="0x01102B70")
+        source = root / "1400.c"
+        source.write_text('#include "missing_dependency.h"\\n' + source.read_text(encoding="utf-8"), encoding="utf-8")
+        report = self.run_audit(root)
+        self.assertIn("BLOCKED — quoted include 1400.c -> missing_dependency.h", report)
+
 
 if __name__ == "__main__":
     unittest.main()
