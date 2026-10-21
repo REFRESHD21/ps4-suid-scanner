@@ -27,6 +27,21 @@ This repository is a research scaffold, not a demonstrated PS4 firmware 14.00 ja
 - Value in that source: `SYSENT=0x01102B70`
 - Interpretation: this establishes the value's upstream source provenance and contradicts the alternate value in the notes file. It does **not** independently validate the offset against a genuine firmware 14.00 kernel image.
 
+## C/header dependency trace
+
+The new static audit checks the quoted includes actually present in the repository's C and header files. On the current branch, it reports six unresolved quoted includes; the GitHub Actions report records them as **BLOCKED**, not as proof that the offsets themselves are wrong.
+
+| Local include | Referencing file | Traceable upstream location |
+|---|---|---|
+| `sections.h` | `1304.c`, `1400.c` | [PS4-HEN sections.h at the source commit](https://github.com/Al-Azif/ps4-hen/blob/d077fb4031cf0e089fb7a233cebeebcd1ed3c68e/kpayload/include/sections.h) |
+| `offsets/1304.h` | `1304.c` | [PS4-HEN offsets/1304.h](https://github.com/Al-Azif/ps4-hen/blob/d077fb4031cf0e089fb7a233cebeebcd1ed3c68e/kpayload/include/offsets/1304.h) |
+| `offsets/1400.h` | `1400.c` | [PS4-HEN offsets/1400.h](https://github.com/Al-Azif/ps4-hen/blob/d077fb4031cf0e089fb7a233cebeebcd1ed3c68e/kpayload/include/offsets/1400.h) |
+| `../offsets.h` | root-level `1304.h`, `1400.h` | [PS4-HEN offsets.h](https://github.com/Al-Azif/ps4-hen/blob/d077fb4031cf0e089fb7a233cebeebcd1ed3c68e/kpayload/include/offsets.h) |
+
+The upstream `offsets.h` itself includes `sections.h`. In the scanner repository, the versioned headers are currently at the repository root rather than under `offsets/`, and their `../offsets.h` includes resolve outside the repository when interpreted relative to those root-level files. The canonical upstream layout places `offsets.h` and `sections.h` in `kpayload/include/`, with version headers in `kpayload/include/offsets/`.
+
+These are dependency/layout findings only. The upstream headers were traced but not copied blindly into this repository: first establish the intended build target, applicable license/provenance, and SDK/compiler requirements. Resolving these includes would enable a more meaningful syntax/build check, but would not validate firmware offsets or demonstrate a jailbreak.
+
 ## Important interpretation
 
 - JavaScript syntax passing proves only that Node.js can parse the file.
