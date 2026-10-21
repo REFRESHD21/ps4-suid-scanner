@@ -110,5 +110,21 @@ class AuditSmokeTests(unittest.TestCase):
         self.assertIn("labels one or more entries partial/unverified", report)
 
 
+    def test_readme_blanket_verified_claim_conflicts_with_partial_gadget(self) -> None:
+        root = self.make_tree(c_sysent="0x01102B70", note_sysent="0x01102B70")
+        (root / "README.md").write_text(
+            "WebKit gadgets: 17/17 verified\\n",
+            encoding="utf-8",
+        )
+        (root / "webkit_gadgets_1400.js").write_text(
+            "// partial: not followed by clean ret\\nconst candidate = 1;\\n",
+            encoding="utf-8",
+        )
+        report = self.run_audit(root)
+        self.assertIn("FAIL — contradictory gadget confidence claim", report)
+        self.assertIn("README or stage two claims 17/17 gadgets verified", report)
+
+
+
 if __name__ == "__main__":
     unittest.main()
