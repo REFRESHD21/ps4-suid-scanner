@@ -95,6 +95,20 @@ class AuditSmokeTests(unittest.TestCase):
         self.assertIn("UNVERIFIED — WebKit gadget evidence", report)
         self.assertIn("binary hash and reproducible extraction evidence are still needed", report)
 
+    def test_blanket_verified_claim_conflicts_with_partial_gadget(self) -> None:
+        root = self.make_tree(
+            c_sysent="0x01102B70",
+            note_sysent="0x01102B70",
+            stage2='log("WebKit gadgets: 17/17 verified");',
+        )
+        (root / "webkit_gadgets_1400.js").write_text(
+            "// partial: not followed by clean ret\\nconst candidate = 1;\\n",
+            encoding="utf-8",
+        )
+        report = self.run_audit(root)
+        self.assertIn("FAIL — contradictory gadget confidence claim", report)
+        self.assertIn("labels one or more entries partial/unverified", report)
+
 
 if __name__ == "__main__":
     unittest.main()
