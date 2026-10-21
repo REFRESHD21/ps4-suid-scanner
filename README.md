@@ -25,7 +25,7 @@ Research tools, kernel offsets, WebKit ROP gadgets, and exploit framework for PS
 | `webkit_gadgets_1304.js` | WebKit ROP gadgets FW 13.04 (16 gadgets) |
 | `1304.c` / `1304.h` | FW 13.04 kernel offset definitions; verify against matching inputs |
 | `webkit_gadgets_1400.js` | Candidate WebKit gadget list; not independently verified |
-| `jordy_stage2_1400.js` | Stage 2: persistent R/W + ROP chain for 14.00 |
+| `jordy_stage2_1400.js` | Incomplete FW 14.00 stage-two scaffold; unresolved primitives and addresses remain |
 | `1400.c` / `1400.h` | Kernel offset definitions; not independently validated |
 | `webkit_gadgets_1350.js` | WebKit ROP gadgets FW 13.50 (18 gadgets) |
 | `1400_offsets.txt` | Offset provenance and verification notes |
@@ -49,12 +49,12 @@ PS4 Browser loads exploit.html
              │ stage2_init()
              ▼
 ┌─────────────────────────────┐
-│  jordy_stage2_1400.js       │  ← PROVIDED
-│  - Persistent R/W           │
-│  - Leak webkit_base         │
-│  - Leak libkernel_base      │
-│  - Build ROP chain          │
-│  - Execute via vtable pivot │
+│  jordy_stage2_1400.js       │  ← INCOMPLETE SCAFFOLD
+│  - Persistent R/W           │  ← NOT IMPLEMENTED/PROVEN
+│  - Leak webkit_base         │  ← PLACEHOLDER
+│  - Leak libkernel_base      │  ← UNVERIFIED
+│  - Build ROP chain          │  ← NOT VALIDATED
+│  - Execute via vtable pivot │  ← NOT VALIDATED
 └────────────┬────────────────┘
              │ ROP → dlsym → mount()
              ▼
@@ -66,7 +66,7 @@ PS4 Browser loads exploit.html
              │ kernel r/w
              ▼
 ┌─────────────────────────────┐
-│  Post-Exploitation          │  ← PROVIDED (offsets in 1400.c)
+│  Post-Exploitation          │  ← NOT USABLE WITHOUT VERIFIED KERNEL R/W
 │  - Escape sandbox (PRISON0) │
 │  - Root vnode               │
 │  - Enable debug menu        │
