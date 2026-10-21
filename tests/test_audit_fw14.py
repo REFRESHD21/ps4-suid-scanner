@@ -13,7 +13,7 @@ AUDIT_SCRIPT = REPO / "tools" / "audit_fw14.py"
 
 
 class AuditSmokeTests(unittest.TestCase):
-    def make_tree(self, *, c_sysent: str, note_sysent: str, stage2: str = "function example() { return 0; }") -> Path:
+    def make_tree(self, *, c_sysent: str, note_sysent: str, stage2: str = "var K = { SYSENT: 0x01102B70 }; function example() { return 0; }") -> Path:
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
         root = Path(temp.name)
@@ -58,6 +58,17 @@ class AuditSmokeTests(unittest.TestCase):
         self.assertIn("PASS — placeholder scan", report)
         self.assertIn("PASS — SYSENT consistency", report)
         self.assertIn("UNVERIFIED — end-to-end FW 14.00 chain", report)
+
+    def test_stage2_sysent_mismatch_is_reported(self) -> None:
+        root = self.make_tree(
+            c_sysent="0x01102B70",
+            note_sysent="0x01102B70",
+            stage2="var K = { SYSENT: 0x0110A760 };",
+        )
+        report = self.run_audit(root)
+        self.assertIn("FAIL — stage-two SYSENT consistency", report)
+        self.assertIn("0x01102b70", report)
+        self.assertIn("0x0110a760", report)
 
     def test_missing_quoted_c_include_is_reported_as_blocked(self) -> None:
         root = self.make_tree(c_sysent="0x01102B70", note_sysent="0x01102B70")
