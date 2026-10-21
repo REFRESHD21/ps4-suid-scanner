@@ -1,0 +1,64 @@
+"""Smoke tests for the FW14 static audit using isolated temporary trees."""
+from __future__ import annotations
+
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
+AUDIT_SCRIPT = REPO / "tools" / "audit_fw14.py"
+
+
+class AuditSmokeTests(unittest.TestCase):
+    def make_tree(self, *, c_sysent: str, note_sysent: str, stage2: str = "function example() { return 0; }") -> Path:
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        root = Path(temp.name)
+        (root / "tools").mkdir()
+        shutil.copy2(AUDIT_SCRIPT, root / "tools" / "audit_fw14.py")
+
+        files = {
+            "1400.c": f"struct offsets {{ unsigned long SYSENT_addr; }};\nstruct offsets offsets = {{ .SYSENT_addr = {c_sysent} }};\n",
+            "1400.h": "/* fixture */\n",
+            "1400_offsets.txt": f"// SYSENT = {note_sysent}\n",
+            "webkit_gadgets_1400.js": "const candidate = 1;\n",
+            "jordy_stage2_1400.js": stage2 + "\n",
+            "exploit.html": "<!doctype html><title>audit fixture</title>\n",
+        }
+        for rel, data in files.items():
+            (root / rel).write_text(data, encoding="utf-8")
+        return root
+
+    def run_audit(self, root: Path) -> str:
+        proc = subprocess.run(
+            [sys.executable, str(root / "tools" / "audit_fw14.py")],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stdout + proc.stderr)
+        report = root / "audit-report.md"
+        self.assertTrue(report.is_file(), "audit report should be generated")
+        return report.read_text(encoding="utf-8")
+
+    def test_conflicting_sysent_is_reported(self) -> None:
+        root = self.make_tree(c_sysent="0x01102B70", note_sysent="0x0110A760")
+        report = self.run_audit(root)
+        self.assertIn("FAIL — SYSENT consistency", report)
+        self.assertIn("0x01102b70", report)
+        self.assertIn("0x0110a760", report)
+
+    def test_ordinary_return_zero_is_not_a_placeholder(self) -> None:
+        root = self.make_tree(c_sysent="0x01102B70", note_sysent="0x01102B70")
+        report = self.run_audit(root)
+        self.assertIn("PASS — placeholder scan", report)
+        self.assertIn("PASS — SYSENT consistency", report)
+        self.assertIn("UNVERIFIED — end-to-end FW 14.00 chain", report)
+
+
+if __name__ == "__main__":
+    unittest.main()
