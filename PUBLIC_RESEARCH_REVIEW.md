@@ -67,3 +67,14 @@ An end-to-end jailbreak claim additionally requires a documented run on actual F
 ## Bottom line
 
 The semaphore advisories are the most concrete public kernel research leads in the reviewed notes because their upstream root causes and security impact are documented. They are **not yet confirmed PS4 exploits**. The correct next milestone is target-specific applicability evidence, not assuming that a newly disclosed FreeBSD bug transfers unchanged to Orbis.
+
+
+## Public scene status cross-check (2026-10-21)
+
+This is a snapshot of public reporting, not proof that no private exploit exists.
+
+- The community-maintained [PS4 Developer Wiki vulnerability index](https://www.psdevwiki.com/ps4/Vulnerabilities) currently marks several public 13.02–13.52 userland paths as patched or at least partially patched on FW 14.00. It does not document a confirmed complete FW 14.00 jailbreak in the reviewed entry.
+- The [ConsoleMods PS4 scene history](https://consolemods.org/wiki/PS4:Scene_History) lists public releases through 13.52 but does not list a complete FW 14.00 jailbreak.
+- Public reporting on the PS5 Relapse chain says its supported range ends at 13.60 and identifies 14.00 as outside the supported range; this is contextual evidence only and should not be used as direct proof of PS4 exploit applicability. See [the 30 September 2026 report and its 14 October update](https://pasqualepillitteri.it/en/news/19414/playstation-5-relapse-jailbreak).
+
+**Conclusion:** the public evidence reviewed here supports treating FW 14.00 as unsupported by a demonstrated public end-to-end chain. It does not prove that a future or privately held chain is impossible. Recheck primary release notes and target evidence before changing this status.
