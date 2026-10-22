@@ -78,3 +78,17 @@ This is a snapshot of public reporting, not proof that no private exploit exists
 - Public reporting on the PS5 Relapse chain says its supported range ends at 13.60 and identifies 14.00 as outside the supported range; this is contextual evidence only and should not be used as direct proof of PS4 exploit applicability. See [the 30 September 2026 report and its 14 October update](https://pasqualepillitteri.it/en/news/19414/playstation-5-relapse-jailbreak).
 
 **Conclusion:** the public evidence reviewed here supports treating FW 14.00 as unsupported by a demonstrated public end-to-end chain. It does not prove that a future or privately held chain is impossible. Recheck primary release notes and target evidence before changing this status.
+
+## Public scene status refresh (2026-10-22)
+
+Checked again against the currently available public PS4 scene references on 2026-10-22:
+
+- The [ConsoleMods PS4 Exploit Chart](https://consolemods.org/wiki/PS4:Exploit_Chart) currently lists no public userland or kernel exploit for firmware 14.00 and above. This is a community-maintained status chart, not a proof that private research does not exist.
+- The [PS4 Developer Wiki vulnerability index](https://www.psdevwiki.com/ps4/Vulnerabilities) describes the public AIO/Relapse kernel exploit implementation as targeting PS4 13.02–13.52 and says it may be patched in 14.00. The cautious wording matters: this is evidence that the published chain should not be assumed to work on 14.00, not a substitute for direct target testing.
+- A GitHub issue requesting GoldHEN support for 14.00 is not a release or exploit demonstration; requests and closed issue status do not establish compatibility. See [ps4-exploit-host issue #224](https://github.com/Al-Azif/ps4-exploit-host/issues/224).
+
+### Effect on this project
+
+No newly found public evidence changes the core assessment. This repository still lacks (1) a demonstrated 14.00 userland entry primitive, (2) matching-firmware binary evidence for gadget and kernel offsets, and (3) a demonstrated compatible kernel exploit. The next productive milestone remains collecting target-specific evidence—not porting offsets or claiming a working chain based only on 13.52 material.
+
+**Confidence label:** “No public end-to-end FW 14.00 jailbreak found in the sources checked on 2026-10-22.” Do not shorten this to “no exploit exists,” because private or unpublished work cannot be ruled out from public sources.
