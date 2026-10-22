@@ -121,6 +121,16 @@ class AuditSmokeTests(unittest.TestCase):
         self.assertIn("FAIL — unsupported WebKit identity claim", report)
         self.assertIn("without matching-binary evidence", report)
 
+    def test_invalid_inline_javascript_is_reported(self) -> None:
+        root = self.make_tree(c_sysent="0x01102B70", note_sysent="0x01102B70")
+        (root / "exploit.html").write_text(
+            "<!doctype html><script>function broken( {</script>\\n",
+            encoding="utf-8",
+        )
+        report = self.run_audit(root)
+        self.assertIn("FAIL — HTML inline JavaScript syntax block 1", report)
+        self.assertIn("Node.js parser", report)
+
     def test_strict_mode_succeeds_when_no_fail_findings_exist(self) -> None:
         root = self.make_tree(
             c_sysent="0x01102B70",
