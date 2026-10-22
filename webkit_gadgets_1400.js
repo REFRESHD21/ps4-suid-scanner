@@ -21,7 +21,7 @@
 //     They may clobber additional registers. Verify before using in chain.
 //   - POP_R13 is actually: pop r13; pop r14; pop r15; ret
 //     Requires 3 stack slots (r13 value + r14 pad + r15 pad)
-//   - All offsets confirmed identical to 13.04 (WebKit not updated in 14.00)
+//   - No matching FW 14.00 binary/hash comparison is recorded here; offsets remain unverified
 // ============================================================
 
 const webkit_gadgets_1400 = {
@@ -56,7 +56,7 @@ const webkit_gadgets_1400 = {
 // IMPORTANT OBSERVATION:
 // The listed offsets are claimed to match FW 13.04; this has NOT been independently verified against a matching FW 14.00 binary.
 // Do not infer that WebKit was unchanged without matching-binary hashes and reproducible comparison.
-// The "stability improvements" in 14.00 were kernel-only patches.
+// Do not infer which components changed from generic release-note wording; verify against matching binaries.
 //
 // This means:
 //   1. WebKit entry vectors from 13.04 require separate 14.00 verification
