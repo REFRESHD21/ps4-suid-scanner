@@ -1,6 +1,6 @@
 // ============================================================
-// Jordy Stage 2 — PS4 Firmware 14.00
-// Persistent R/W + ROP Chain + Kernel Exploit
+// Jordy Stage 2 — PS4 Firmware 14.00 (INCOMPLETE SCAFFOLD)
+// Proposed R/W + ROP + kernel-exploit integration; not validated end to end
 //
 // WebKit gadget candidates: webkit_gadgets_1400.js (not independently verified)
 // Kernel offsets: 1400.c (Al-Azif, Scene-Collective)
@@ -122,8 +122,8 @@ function stage2_init(candidate, rwView, rwHeader, scratchBytes, scratchWords) {
     g_scratchBytes = scratchBytes;
     g_scratchWords = scratchWords;
 
-    log("Stage 2 initialized — FW 14.00");
-    log("Persistent r/w active via candidate m_vector control");
+    log("Stage 2 scaffold invoked — FW 14.00");
+    log("R/W state references assigned; primitive behavior is unverified");
 
     try {
         stage2_run();
@@ -144,7 +144,7 @@ function stage2_restore() {
 
 // ============================================================
 // STEP 1: Read/Write primitives
-// These work by redirecting the Uint8Array's backing buffer
+// These are intended to redirect a Uint8Array backing buffer; they are not validated until a real entry primitive supplies compatible state.
 // ============================================================
 function setVector(addr) {
     var lo = addr & 0xFFFFFFFF;
