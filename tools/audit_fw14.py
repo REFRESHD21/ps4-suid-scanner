@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -79,8 +80,31 @@ else:
         if proc.returncode == 0:
             add("PASS", f"JavaScript syntax {path.name}", "Node.js parser accepted file")
         else:
-            detail = (proc.stderr or proc.stdout).strip().replace("\n", " ")
+            detail = (proc.stderr or proc.stdout).strip().replace("\\n", " ")
             add("FAIL", f"JavaScript syntax {path.name}", detail[:500])
+
+# Also parse inline scripts in the HTML entry page. Standalone .js checks alone
+# would miss syntax errors in code embedded directly in the browser UI.
+html_text = read("exploit.html")
+inline_scripts = [
+    script for script in re.findall(r"<script\\b[^>]*>(.*?)</script\\s*>", html_text, re.I | re.S)
+    if script.strip()
+]
+if not node:
+    add("BLOCKED", "HTML inline JavaScript syntax", "Node.js is not installed")
+elif not inline_scripts:
+    add("UNVERIFIED", "HTML inline JavaScript syntax", "no non-empty inline script blocks found")
+else:
+    with tempfile.TemporaryDirectory(prefix="fw14-audit-") as temp_dir:
+        for index, script in enumerate(inline_scripts, 1):
+            script_path = Path(temp_dir) / f"inline-{index}.js"
+            script_path.write_text(script, encoding="utf-8")
+            proc = subprocess.run([node, "--check", str(script_path)], capture_output=True, text=True)
+            if proc.returncode == 0:
+                add("PASS", f"HTML inline JavaScript syntax block {index}", "Node.js parser accepted embedded script")
+            else:
+                detail = (proc.stderr or proc.stdout).strip().replace("\\n", " ")
+                add("FAIL", f"HTML inline JavaScript syntax block {index}", detail[:500])
 
 # Find contradictory SYSENT claims between the C source and verification notes.
 c_src = read("1400.c")
