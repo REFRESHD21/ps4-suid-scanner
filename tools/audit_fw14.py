@@ -80,14 +80,14 @@ else:
         if proc.returncode == 0:
             add("PASS", f"JavaScript syntax {path.name}", "Node.js parser accepted file")
         else:
-            detail = (proc.stderr or proc.stdout).strip().replace("\\n", " ")
+            detail = (proc.stderr or proc.stdout).strip().replace("\n", " ")
             add("FAIL", f"JavaScript syntax {path.name}", detail[:500])
 
 # Also parse inline scripts in the HTML entry page. Standalone .js checks alone
 # would miss syntax errors in code embedded directly in the browser UI.
 html_text = read("exploit.html")
 inline_scripts = [
-    script for script in re.findall(r"<script\\b[^>]*>(.*?)</script\\s*>", html_text, re.I | re.S)
+    script for script in re.findall(r"<script\b[^>]*>(.*?)</script\s*>", html_text, re.I | re.S)
     if script.strip()
 ]
 if not node:
@@ -103,7 +103,7 @@ else:
             if proc.returncode == 0:
                 add("PASS", f"HTML inline JavaScript syntax block {index}", "Node.js parser accepted embedded script")
             else:
-                detail = (proc.stderr or proc.stdout).strip().replace("\\n", " ")
+                detail = (proc.stderr or proc.stdout).strip().replace("\n", " ")
                 add("FAIL", f"HTML inline JavaScript syntax block {index}", detail[:500])
 
 # Find contradictory SYSENT claims between the C source and verification notes.
