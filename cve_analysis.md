@@ -1,99 +1,44 @@
-# CVE Analysis for PS4 Kernel (Orbis OS / FreeBSD 9)
+# CVE Analysis for PS4 Kernel (Orbis OS / FreeBSD-derived)
+
+This document separates upstream vulnerability facts from claims about PS4 firmware. A bug in modern FreeBSD is not automatically present or exploitable in the PS4's older, customized kernel. Do not treat any candidate below as a PS4 kernel exploit without source-level comparison and target testing.
 
 ## CVE-2026-7270 — execve() Buffer Overflow ❌ DISCARDED
 
-- **Type:** Local privilege escalation
-- **Component:** exec_args_adjust_args() in sys/kern/kern_exec.c
-- **Bug:** Operator precedence error in memmove size calculation
-- **Status:** DISCARDED — function introduced in FreeBSD 13.0, not present in FreeBSD 9, 10, 11, or 12. PS4 uses FreeBSD 9.
-- **Verified:** Searched FreeBSD 9.0, 10.0, and 11.0 source trees
-- **Conclusion:** Function was introduced in FreeBSD 12+, not present in PS4 kernel
+- **Claim reviewed:** local privilege escalation in `exec_args_adjust_args()`.
+- **Repository assessment:** discarded because the function was not found in the older FreeBSD source versions examined for this project.
+- **Evidence limitation:** record the exact source-tree revisions and search commands before treating this negative result as independently reproducible.
 
-## CVE-2026-49415 — execve() TOCTOU Race ⚠️ CANDIDATE
+## CVE-2026-49415 — execve() TOCTOU Race ⚠️ NOT ESTABLISHED FOR PS4
 
-- **Type:** Local privilege escalation
-- **Component:** execve(2) SUID handling in sys/kern/kern_exec.c
-- **Bug:** TOCTOU race condition between credential check and application
-- **Discovered by:** Synacktiv
-- **Patched:** June 30, 2026 (after PS4 13.04 release)
-- **Status:** CANDIDATE — SUID code confirmed present in FreeBSD 9
-- **Evidence:** setsugid(), setugidsafety() found at lines 654-702 of kern_exec.c
-- **Key code path:**
-  1. VOP_GETATTR reads file attributes (SUID bit)
-  2. credential_changing checks S_ISUID/S_ISGID
-  3. setsugid() marks process
-  4. PROC_UNLOCK → VOP_UNLOCK → window of vulnerability
-  5. setugidsafety() closes insecure fds
-- **Challenge:** PS4 may not have accessible SUID binaries from BD-J sandbox
+- **Upstream status:** real FreeBSD security advisory, FreeBSD-SA-26:39.execve, announced 2026-06-30; credited to Synacktiv.
+- **Upstream description:** during execution of a SUID binary, a window exists after installing the new address space but before updating credentials. The advisory describes same-user access to the target process through procfs or linprocfs during that window.
+- **Authoritative source:** [FreeBSD Security Advisory FreeBSD-SA-26:39.execve](https://lists.freebsd.org/archives/freebsd-security/2026-June/000522.html).
+- **Affected versions stated by the advisory:** supported modern FreeBSD release branches, with fixes listed for FreeBSD 14.x and 15.x. This is not evidence that the issue exists in the PS4's FreeBSD-derived kernel.
+- **PS4 status:** UNVERIFIED. This repository has not demonstrated that the vulnerable ordering and relevant procfs/linprocfs access path exist in the target PS4 kernel, nor that a process in the relevant PS4 sandbox can reach the needed interface.
+- **Correction to earlier reasoning:** finding generic SUID-related functions such as `setsugid()` or `setugidsafety()` in an older source tree is not enough to establish this specific race. The affected code path, process-memory access checks, and credential transition must be compared against the actual target source/binary.
+- **Conclusion:** research lead only, not a demonstrated FW 14.00 kernel exploit. Do not advertise it as a candidate that is known to affect PS4.
 
-## Celsius / ffs_mount — Integer Overflow 🔥 CONFIRMED
+### Evidence needed to revisit this lead
 
-- **Type:** Kernel heap overflow
-- **Component:** ffs_mountfs() in sys/ufs/ffs/ffs_vfsops.c
-- **Discovered by:** bollars (via kernel diffing)
-- **Works on:** PS4 up to 13.04, PS5 up to 12.70
-- **Patched in:** PS4 13.50, PS5 13.00
-- **Status:** CONFIRMED — vulnerable code present in FreeBSD 9
+1. Identify the exact PS4 kernel build/source baseline and relevant customized changes.
+2. Compare the complete execve credential/address-space transition with the vulnerable upstream implementation.
+3. Establish whether procfs/linprocfs or an equivalent permitted interface exists and is reachable by the relevant unprivileged PS4 process.
+4. Record a reproducible, non-destructive test and the exact firmware/build. Do not infer exploitability from matching function names.
 
-### Vulnerable code:
-```c
-// Line ~910 in ffs_vfsops.c
-size = fs->fs_cssize;                          // from superblock (attacker controlled)
-blks = howmany(size, fs->fs_fsize);
-if (fs->fs_contigsumsize > 0)
-    size += fs->fs_ncg * sizeof(int32_t);      // INTEGER OVERFLOW HERE
-size += fs->fs_ncg * sizeof(u_int8_t);
-space = malloc((u_long)size, M_UFSMNT, M_WAITOK);  // allocates SMALL buffer
+## Celsius / ffs_mount — Integer Overflow ⚠️ FIRMWARE-SCOPED CLAIM
 
-// Later in the same function:
-if (fs->fs_contigsumsize > 0) {
-    fs->fs_maxcluster = lp = space;
-    for (i = 0; i < fs->fs_ncg; i++)           // iterates fs_ncg times
-        *lp++ = fs->fs_contigsumsize;           // HEAP OVERFLOW
-    space = lp;
-}
-```
+- **Reported component:** `ffs_mountfs()` in the UFS/FFS filesystem code.
+- **Repository notes:** describe a malformed UFS superblock triggering an integer-overflow/heap-overflow condition and state that the known chain works through PS4 13.04, with the issue patched in 13.50.
+- **FW 14.00 conclusion:** do not assume compatibility; repository evidence says the known path is patched before 14.00. No replacement kernel exploit is demonstrated here.
+- **Evidence limitation:** the source tree currently does not contain an independently reproducible kernel diff or hardware validation record in this audit branch. Treat firmware support statements as sourced claims until those artifacts are linked.
 
-### Exploitation:
-1. Craft UFS image with malicious superblock (fs_ncg = 0x40000001)
-2. Mount via BD-J or Vue entry point
-3. Integer overflow causes small malloc + massive heap write
-4. Heap grooming needed to control what gets overwritten
-5. Convert heap overflow to kernel read/write
-6. Patch kernel, load payload
+## MP4 Parser Vulnerability ⚠️ UNVERIFIED LEAD
 
-### Requirements:
-- BD-J or Vue userland entry point
-- 250GB+ HDD with malformed UFS image (per Victor's guidance)
-- Kernel offsets for target firmware
+- **Reported component:** MP4/M4A atom parsing, possibly in a multimedia library.
+- **Repository notes:** attribute the report to Shunsui and describe malformed atom sizes associated with a crash on FW 11.00.
+- **PS4 14.00 status:** no crash reproduction, target module identity/hash, root-cause analysis, exploitability assessment, or kernel privilege-escalation chain is supplied in this repository.
+- **Conclusion:** a crash report is not proof of a controllable memory-corruption primitive or a kernel exploit. Keep this as an unverified lead until the source artifacts and test conditions are documented.
 
-### Superblock structure (key fields):
-```
-Offset in struct fs:
-  fs_ncg           (u_int32_t) — controls the overflow
-  fs_bsize         (int32_t)   — must pass validation checks
-  fs_fsize         (int32_t)   — must pass validation checks
-  fs_cssize        (int32_t)   — initial size value
-  fs_contigsumsize (int32_t)   — must be > 0 to trigger vulnerable path
-```
+## Research standard
 
-## MP4 Parser Vulnerability ⚠️ UNDER INVESTIGATION
-
-- **Type:** Heap buffer overflow in multimedia parser
-- **Component:** MP4/M4A atom parser (likely libSceAvPlayer)
-- **Discovered by:** Shunsui
-- **Confirmed on:** FW 11.00 (Media Player + SHAREfactory)
-- **Likely affected:** All PS4 firmwares including 13.04 and 13.52
-
-### Bug details:
-- moov.udta.meta atom declares 90 bytes
-- Child atom at offset 0x833 declares 190 bytes → exceeds parent
-- Parser reads beyond buffer bounds → heap corruption
-- Second corrupt atom at offset 0x885
-- Media Player freezes, SHAREfactory gives error 34878-0
-
-### Potential exploitation:
-- Control overflow size by modifying declared atom size
-- Control overflow content (attacker data in atom body)
-- Possible to overwrite return addresses, vtable pointers, or heap metadata
-- Needs core dump analysis to determine exact crash point and exploitability
+For every proposed kernel vulnerability, preserve the original advisory or disclosure, affected-version scope, exact target firmware/build, source/binary provenance, reproduction steps, observed result, and limitations. A CVE affecting upstream FreeBSD does not by itself establish that Orbis OS inherits the same bug. None of the leads in this document establishes a working PS4 FW 14.00 jailbreak.

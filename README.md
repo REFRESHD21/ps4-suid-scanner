@@ -4,14 +4,14 @@ Research tools, kernel offsets, WebKit ROP gadgets, and exploit framework for PS
 
 ## 🔥 What's New — FW 14.00 WebKit Release
 
-**WebKit on 14.00 is IDENTICAL to 13.04.** All 17 ROP gadgets have the same offsets. Sony only patched the kernel in FW 14.00 ("stability improvements"). This means all WebKit entry vectors from 13.04 work on 14.00.
+**Unverified hypothesis:** this repository does not currently include independently reproducible evidence that WebKit on 14.00 is byte-identical to 13.04. Matching gadget offsets alone would not prove that every 13.04 exploit entry vector works on 14.00.
 
-### Ready for the scene:
-- ✅ `webkit_gadgets_1400.js` — 17/17 ROP gadgets verified
-- ✅ `1400.c` — Complete kernel offsets (Al-Azif / Scene-Collective)
-- ✅ `jordy_stage2_1400.js` — Stage 2 with R/W primitives + ROP chain builder
-- ✅ `exploit.html` — WebKit entry page with FW detection + analysis mode
-- ⚠️ **Needed from scene**: WebKit exploit primitive (Jordy/ntfargo port) + KEX for 14.00
+### Current status: research scaffold, not a working 14.00 jailbreak
+- ⚠️ Gadget offsets are source claims; the exact binary hash and reproducible extraction evidence are not included here.
+- ⚠️ `SYSENT=0x01102B70` has traceable upstream source provenance; independent validation against a matching 14.00 kernel image is still absent. Other offsets remain provisional.
+- ❌ `exploit.html` explicitly says the WebKit primitive is not integrated.
+- ❌ `jordy_stage2_1400.js` contains unresolved address/primitive placeholders.
+- ❌ A compatible kernel exploit for 14.00 has not been demonstrated by this repository.
 
 ## Contents
 
@@ -23,12 +23,12 @@ Research tools, kernel offsets, WebKit ROP gadgets, and exploit framework for PS
 | `build_celsius_ufs.py` | **Celsius UFS image generator** (malformed superblock with integer overflow) |
 | `jordy_stage2.js` | Stage 2: persistent R/W + Celsius KEX integration for 13.04 |
 | `webkit_gadgets_1304.js` | WebKit ROP gadgets FW 13.04 (16 gadgets) |
-| `1304.c` / `1304.h` | Complete kernel offsets FW 13.04 |
-| `webkit_gadgets_1400.js` | WebKit ROP gadgets FW 14.00 (17/17 verified) |
-| `jordy_stage2_1400.js` | Stage 2: persistent R/W + ROP chain for 14.00 |
-| `1400.c` / `1400.h` | Complete kernel offsets FW 14.00 |
+| `1304.c` / `1304.h` | FW 13.04 kernel offset definitions; verify against matching inputs |
+| `webkit_gadgets_1400.js` | Candidate WebKit gadget list; not independently verified |
+| `jordy_stage2_1400.js` | Incomplete FW 14.00 stage-two scaffold; unresolved primitives and addresses remain |
+| `1400.c` / `1400.h` | Kernel offset definitions; not independently validated |
 | `webkit_gadgets_1350.js` | WebKit ROP gadgets FW 13.50 (18 gadgets) |
-| `1400_offsets.txt` | Offset verification notes |
+| `1400_offsets.txt` | Offset provenance and verification notes |
 | `1352_offsets.txt` | Partial kernel offsets FW 13.52 |
 | `cve_analysis.md` | CVE analysis for PS4 kernel |
 | `hen.bin` | PS4-HEN compiled for FW 13.04 |
@@ -49,12 +49,12 @@ PS4 Browser loads exploit.html
              │ stage2_init()
              ▼
 ┌─────────────────────────────┐
-│  jordy_stage2_1400.js       │  ← PROVIDED
-│  - Persistent R/W           │
-│  - Leak webkit_base         │
-│  - Leak libkernel_base      │
-│  - Build ROP chain          │
-│  - Execute via vtable pivot │
+│  jordy_stage2_1400.js       │  ← INCOMPLETE SCAFFOLD
+│  - Persistent R/W           │  ← NOT IMPLEMENTED/PROVEN
+│  - Leak webkit_base         │  ← PLACEHOLDER
+│  - Leak libkernel_base      │  ← UNVERIFIED
+│  - Build ROP chain          │  ← NOT VALIDATED
+│  - Execute via vtable pivot │  ← NOT VALIDATED
 └────────────┬────────────────┘
              │ ROP → dlsym → mount()
              ▼
@@ -66,7 +66,7 @@ PS4 Browser loads exploit.html
              │ kernel r/w
              ▼
 ┌─────────────────────────────┐
-│  Post-Exploitation          │  ← PROVIDED (offsets in 1400.c)
+│  Post-Exploitation          │  ← NOT USABLE WITHOUT VERIFIED KERNEL R/W
 │  - Escape sandbox (PRISON0) │
 │  - Root vnode               │
 │  - Enable debug menu        │
@@ -79,7 +79,7 @@ PS4 Browser loads exploit.html
 ## Status (October 2026)
 
 ### WebKit Entry Points (13.04 → 14.00)
-Since WebKit was NOT updated in 14.00, all 13.04 vectors should work:
+The following vectors are documented as tested on 13.04 only. Their applicability to 14.00 is unverified:
 - ✅ **DOM postMessage** — Type confusion, confirmed on 13.04
 - ✅ **DOM getters** — UAF, confirmed on 13.04
 - ✅ **LLInt OOB** — Out-of-bounds read, confirmed on 13.04
@@ -115,47 +115,44 @@ Since WebKit was NOT updated in 14.00, all 13.04 vectors should work:
 6. Click **Run Exploit (Celsius)** to trigger the userland chain + Celsius kernel exploit.
 7. Once kernel patches are applied, send payload (GoldHEN/HEN) to port 9021.
 
-### On PS4 (FW 14.00 — Gadgets Verified)
-1. Host `exploit.html`, `webkit_gadgets_1400.js`, and `jordy_stage2_1400.js`.
-2. Navigate PS4 browser to `http://<your-ip>:<port>/exploit.html`.
-3. Press **Run Exploit**.
-4. *(Runs stage2 analysis until scene integrates 14.00 WebKit primitive + new KEX)*.
+### On PS4 (FW 14.00 — incomplete research scaffold)
+There is no working 14.00 exploit flow to run in this repository. The page is a diagnostic scaffold; the WebKit primitive and compatible kernel exploit are missing. Do not interpret its analysis output as a jailbreak or run unverified offset/payload code on a console.
 
 ### For Development (PC)
 1. Open `exploit_1304.html` or `exploit.html` in any browser.
 2. Automatically detects non-PS4 and enters survey/analysis mode.
-3. Displays all verified gadgets, kernel offsets, and chain structure.
+3. Displays source-declared gadget candidates and offsets for analysis; this view does not independently verify them.
 
 ## WebKit Gadgets (14.00)
 
-All offsets from `libSceNKWebKit.sprx.decrypted`:
+Offsets claimed by repository source; the matching binary hash and reproducible extraction output are not supplied:
 
 | Gadget | Offset | Bytes | Status |
 |--------|--------|-------|--------|
-| RET | `0x4032` | `c3` | ✅ Verified |
-| LEAVE_RET | `0x1c2f7` | `c9 c3` | ✅ Verified |
-| POP_RAX_RET | `0x14504` | `58 c3` | ✅ Verified |
-| POP_RBX_RET | `0xb9e8` | `5b c3` | ✅ Verified |
-| POP_RCX_RET | `0x1fade` | `59 c3` | ✅ Verified |
-| POP_RDI_RET | `0x60480` | `5f c3` | ✅ Verified |
-| POP_RDX_RET | `0x1305ba` | `5a c3` | ✅ Verified |
-| POP_RSI_RET | `0x7245e` | `5e c3` | ✅ Verified |
-| POP_RBP_RET | `0x40b6` | `5d c3` | ✅ Verified |
-| POP_RSP_RET | `0x73017` | `5c c3` | ✅ Stack pivot |
-| POP_R8_RET | `0x230cbe1` | `41 58 c3` | ✅ Verified |
-| POP_R9_RET | `0x9df883` | `41 59 c3` | ✅ Verified |
-| POP_R10_RET | `0x2dc33b5` | `41 5a 41...` | ⚠️ Partial |
-| POP_R11_RET | `0x19c9ba` | `41 5b 41...` | ⚠️ Partial |
-| POP_R12_RET | `0x242ab15` | `41 5c c3` | ✅ Verified |
-| POP_R13_R14_R15_RET | `0x6047b` | `41 5d 41 5e 41 5f c3` | ✅ Multi-pop |
-| POP_R14_RET | `0xa9e91` | `41 5e c3` | ✅ Verified |
-| POP_R15_RET | `0x6047f` | `41 5f c3` | ✅ Verified |
+| RET | `0x4032` | `c3` | Source claim only |
+| LEAVE_RET | `0x1c2f7` | `c9 c3` | Source claim only |
+| POP_RAX_RET | `0x14504` | `58 c3` | Source claim only |
+| POP_RBX_RET | `0xb9e8` | `5b c3` | Source claim only |
+| POP_RCX_RET | `0x1fade` | `59 c3` | Source claim only |
+| POP_RDI_RET | `0x60480` | `5f c3` | Source claim only |
+| POP_RDX_RET | `0x1305ba` | `5a c3` | Source claim only |
+| POP_RSI_RET | `0x7245e` | `5e c3` | Source claim only |
+| POP_RBP_RET | `0x40b6` | `5d c3` | Source claim only |
+| POP_RSP_RET | `0x73017` | `5c c3` | Claimed stack pivot; unverified |
+| POP_R8_RET | `0x230cbe1` | `41 58 c3` | Source claim only |
+| POP_R9_RET | `0x9df883` | `41 59 c3` | Source claim only |
+| POP_R10_RET | `0x2dc33b5` | `41 5a 41...` | Partial/unverified |
+| POP_R11_RET | `0x19c9ba` | `41 5b 41...` | Partial/unverified |
+| POP_R12_RET | `0x242ab15` | `41 5c c3` | Source claim only |
+| POP_R13_R14_R15_RET | `0x6047b` | `41 5d 41 5e 41 5f c3` | Claimed multi-pop; unverified |
+| POP_R14_RET | `0xa9e91` | `41 5e c3` | Source claim only |
+| POP_R15_RET | `0x6047f` | `41 5f c3` | Source claim only |
 
-**Key finding:** All offsets are identical between 13.04 and 14.00, confirming WebKit was unchanged.
+**Evidence status:** these offsets are claims in repository source. Without the exact 14.00 binary, its hash, and reproducible byte-pattern verification, they do not confirm that WebKit was unchanged.
 
 ## Kernel Offsets (14.00)
 
-From `1400.c` — source: Al-Azif (Scene-Collective/ps4-hen pre-release-main-182):
+Copied from `1400.c`; values are **unverified for this repository's target firmware** until independently checked against a matching kernel image. The `SYSENT` value has upstream source provenance but remains independently unverified against a matching kernel image.
 
 ```
 PRISON0    = 0x0111FA18    (sandbox escape)

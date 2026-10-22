@@ -1,0 +1,45 @@
+name: FW 14.00 Static Audit
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run audit smoke tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Generate static audit report
+        run: python3 tools/audit_fw14.py
+      - name: Fail CI on confirmed audit contradictions
+        run: python3 tools/audit_fw14.py --strict
+      - name: Add report to workflow summary
+        if: always()
+        run: |
+          if [ -f audit-report.md ]; then
+            cat audit-report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Audit report was not generated." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fw14-static-audit-report
+          path: audit-report.md
+          if-no-files-found: warn

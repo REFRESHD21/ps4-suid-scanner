@@ -1,19 +1,23 @@
 // PS4 Kernel Offsets - Firmware 14.00 (PROVISIONAL / UNVERIFIED)
-// Status: PENDING VERIFICATION against clean 14.00 flash dump
-// Notice: Previous offsets were synthetically generated and require byte-pattern validation.
-// Sony released FW 14.00 on September 16, 2026
+// Status: source provenance reviewed; still requires validation against a matching 14.00 kernel image.
+// Provenance: Al-Azif/ps4-hen upstream commit d077fb4031cf0e089fb7a233cebeebcd1ed3c68e.
+// Immutable source: https://github.com/Al-Azif/ps4-hen/blob/d077fb4031cf0e089fb7a233cebeebcd1ed3c68e/kpayload/source/offsets/1400.c
+// Important: upstream source provenance is not independent binary validation.
 
-// Data addresses (CRITICAL: Needs dump confirmation):
+// Data addresses (require matching firmware dump confirmation):
 // XFAST_SYSCALL = 0x000001C0
-// PRISON0       = 0x0111FA18 (Tentative, matches 13.00-13.52)
-// ROOTVNODE     = 0x02136E90 (Tentative, matches 13.00-13.52)
-// SYSENT        = 0x0110A760 (Carried from 13.52; DO NOT revert to 13.04 0x01102B70)
-// M_TEMP        = 0x01520D00
-// ALLPROC       = 0x01B28538
-// FPU_CTX       = 0x026542C0
+// PRISON0       = 0x0111FA18 (provisional; verify against matching dump)
+// ROOTVNODE     = 0x02136E90 (provisional; verify against matching dump)
+// SYSENT        = 0x01102B70 (matches the cited upstream source; not independently binary-verified)
+// M_TEMP        = 0x01520D00 (provisional; verify against matching dump)
+// ALLPROC       = 0x01B28538 (provisional; verify against matching dump)
+// FPU_CTX       = 0x026542C0 (provisional; verify against matching dump)
 
-// Function addresses (FLAGGED: Synthetic +0x350/+0xA00 deltas under audit):
-// Use find_webkit_gadgets_1400.py to extract ground-truth opcodes.
+// The alternative SYSENT value 0x0110A760 is contradicted by the cited upstream source.
+// Do not present it as an equally supported alternative. Do not claim either source value
+// is independently validated against a genuine firmware 14.00 kernel image.
+
+// Function addresses (unverified; do not use without matching-binary evidence):
 // memcmp          = PENDING_DUMP
 // strstr          = PENDING_DUMP
 // memcpy          = PENDING_DUMP
@@ -24,13 +28,12 @@
 // fpu_kern_leave  = PENDING_DUMP
 // proc_rwmem      = PENDING_DUMP
 
-// Known stable functions:
-// malloc          = 0x00009520 (Subject to ASLR/kernel layout check)
+// Known stable functions (still require firmware/layout confirmation):
+// malloc          = 0x00009520
 // free            = 0x000096E0
 // _sx_xlock       = 0x000A3840
 // _sx_xunlock     = 0x000A3A00
 
-// Analysis:
-// - Do NOT inject these offsets into PPPwn/GoldHEN until full ELF dump verification.
-// - Byte signatures will be extracted using find_webkit_gadgets_1400.py.
-// - Kernel panic hazard if uniform deltas (+0x350) are executed.
+// Do not inject unverified offsets into PPPwn/GoldHEN or run them on hardware.
+// A reproducible verification requires the exact firmware/module identity, a matching
+// binary hash, documented extraction method, and independent confirmation.
