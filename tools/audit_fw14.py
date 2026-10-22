@@ -140,7 +140,7 @@ else:
 # and partial gadget evidence. README claims are user-facing and must be audited too.
 stage2 = read("jordy_stage2_1400.js")
 claim_sources = "\n".join(read(rel) for rel in ("README.md", "jordy_stage2_1400.js", "exploit.html", "webkit_gadgets_1400.js"))
-if re.search(r"all offsets confirmed identical to 13\\.04|WebKit not updated in 14\\.00|stability improvements.{0,60}kernel-only patches|usually kernel-only patches", claim_sources, re.I):
+if re.search(r"all offsets confirmed identical to 13[.]04|WebKit not updated in 14[.]00|stability improvements.{0,60}kernel-only patches|usually kernel-only patches", claim_sources, re.I):
     add("FAIL", "unsupported WebKit identity claim",
         "source treats 14.00 WebKit identity or release-note wording as established without matching-binary evidence")
 else:
