@@ -110,6 +110,17 @@ class AuditSmokeTests(unittest.TestCase):
         self.assertIn("repository claims 17/17 gadgets verified", report)
 
 
+
+    def test_unsupported_webkit_identity_claim_is_reported(self) -> None:
+        root = self.make_tree(c_sysent="0x01102B70", note_sysent="0x01102B70")
+        (root / "webkit_gadgets_1400.js").write_text(
+            "// All offsets confirmed identical to 13.04 (WebKit not updated in 14.00)\\n",
+            encoding="utf-8",
+        )
+        report = self.run_audit(root)
+        self.assertIn("FAIL — unsupported WebKit identity claim", report)
+        self.assertIn("without matching-binary evidence", report)
+
     def test_strict_mode_succeeds_when_no_fail_findings_exist(self) -> None:
         root = self.make_tree(
             c_sysent="0x01102B70",
