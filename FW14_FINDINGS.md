@@ -73,3 +73,9 @@ The CVE analysis now distinguishes the real upstream FreeBSD advisory for CVE-20
 Reference: [FreeBSD-SA-26:39.execve](https://lists.freebsd.org/archives/freebsd-security/2026-June/000522.html).
 
 This qualification changes no overall conclusion: no compatible FW 14.00 kernel exploit or end-to-end jailbreak has been demonstrated by this repository.
+
+## Public-status checkpoint — 2026-10-22
+
+The latest public-source check found no published end-to-end PS4 FW 14.00 jailbreak in the [ConsoleMods exploit chart](https://consolemods.org/wiki/PS4:Exploit_Chart). The [PS4 Developer Wiki vulnerability index](https://www.psdevwiki.com/ps4/Vulnerabilities) describes the public AIO/Relapse implementation as targeting 13.02–13.52 and says it may be patched in 14.00. This is a public-status snapshot, not proof that private research does not exist.
+
+**Research priority remains:** obtain target-specific FW 14.00 evidence for the browser entry point and kernel candidate before changing status labels. Matching a 13.52 offset, finding an upstream FreeBSD advisory, or seeing a GitHub issue request is not a reproduction. No new evidence found in this refresh resolves the three major blockers: userland primitive, verified matching-firmware offsets, and compatible kernel exploit.
