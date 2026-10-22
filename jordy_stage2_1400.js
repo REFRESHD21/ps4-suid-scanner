@@ -9,8 +9,8 @@
 // 1. Include webkit_gadgets_1400.js before this file
 // 2. Replace Jordy's restoration block (lines 500-507)
 //    with a call to stage2_init()
-// 3. This keeps the candidate alive and exposes r/w primitives
-// 4. Builds and executes ROP chain for kernel access via Celsius
+// 3. Intended to preserve candidate state and expose R/W primitives; not validated
+// 4. ROP/kernel path is a design scaffold; no compatible 14.00 KEX is integrated
 // ============================================================
 
 // Global state from Jordy
